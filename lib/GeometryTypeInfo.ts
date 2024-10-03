@@ -1,4 +1,4 @@
-import { GeometryType } from "@ngageoint/simple-features-js";
+import { GeometryType } from "./sf/internal";
 
 /**
  * Geometry type info

@@ -1,4 +1,5 @@
-import { Point } from "@ngageoint/simple-features-js";
+import { describe, it, expect, should } from 'vitest';
+import { Point } from "../lib/sf/internal";
 import {GeometryReader} from "../lib/GeometryReader";
 import {GeometryWriter} from "../lib/GeometryWriter";
 import WKBTestUtils from "./WKBTestUtils";
@@ -22,7 +23,7 @@ describe('README Tests', function () {
 
 	it('test read', function () {
 		const geometry = testRead(BYTES);
-		geometry.equals(GEOMETRY).should.be.true;
+		expect(geometry.equals(GEOMETRY)).toBe(true);
 	});
 
 	it('test write', function () {

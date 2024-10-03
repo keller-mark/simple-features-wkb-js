@@ -1,4 +1,4 @@
-const should = require('chai').should();
+import { describe, it, expect, should } from 'vitest';
 import WKBTestUtils from './WKBTestUtils';
 import { ByteOrder } from '../lib/ByteOrder'
 import { GeometryWriter } from '../lib/GeometryWriter'
@@ -8,7 +8,7 @@ import {
   FiniteFilterType, GeometryCollection,
   GeometryType, LineString, MultiPolygon, Point,
   PointFiniteFilter, Polygon
-} from '@ngageoint/simple-features-js'
+} from '../lib/sf/internal'
 import { GeometryReader } from '../lib/GeometryReader'
 import { GeometryCodes } from '../lib/GeometryCodes'
 import { ByteReader } from '../lib/ByteReader'
@@ -30,7 +30,7 @@ function geometryTester(geometry, compareGeometry) {
   const bytes1 = global.writeBuffer(geometry, ByteOrder.BIG_ENDIAN);
   const bytes2 = global.writeBuffer(geometry, ByteOrder.LITTLE_ENDIAN);
 
-  global.equalByteArrays(bytes1, bytes2).should.be.false;
+  expect(global.equalByteArrays(bytes1, bytes2)).toBe(false);
 
   // Test that the bytes are read using their written byte order, not
   // the specified
@@ -112,33 +112,33 @@ function _testFiniteFilter(bytes, filter) {
 
       switch (filter.getType()) {
         case FiniteFilterType.FINITE:
-          Number.isFinite(point.x).should.be.true;
-          Number.isFinite(point.y).should.be.true;
+          expect(Number.isFinite(point.x)).toBe(true);
+          expect(Number.isFinite(point.y)).toBe(true);
           if (filter.isFilterZ() && point.hasZ) {
-            Number.isFinite(point.z).should.be.true;
+            expect(Number.isFinite(point.z)).toBe(true);
           }
           if (filter.isFilterM() && point.hasM) {
-            Number.isFinite(point.m).should.be.true;
+            expect(Number.isFinite(point.m)).toBe(true);
           }
           break;
         case FiniteFilterType.FINITE_AND_NAN:
-          (Number.isFinite(point.x) || Number.isNaN(point.x)).should.be.true;
-          (Number.isFinite(point.y) || Number.isNaN(point.y)).should.be.true;
+          expect(Number.isFinite(point.x) || Number.isNaN(point.x)).toBe(true);
+          expect(Number.isFinite(point.y) || Number.isNaN(point.y)).toBe(true);
           if (filter.isFilterZ() && point.hasZ) {
-            (Number.isFinite(point.z) || Number.isNaN(point.z)).should.be.true;
+            expect(Number.isFinite(point.z) || Number.isNaN(point.z)).toBe(true);
           }
           if (filter.isFilterM() && point.hasM) {
-            (Number.isFinite(point.m) || Number.isNaN(point.m)).should.be.true;
+            expect(Number.isFinite(point.m) || Number.isNaN(point.m)).toBe(true);
           }
           break;
         case FiniteFilterType.FINITE_AND_INFINITE:
-          (Number.isFinite(point.x) || !Number.isFinite(point.x)).should.be.true;
-          (Number.isFinite(point.y) || !Number.isFinite(point.y)).should.be.true;
+          expect(Number.isFinite(point.x) || !Number.isFinite(point.x)).toBe(true);
+          expect(Number.isFinite(point.y) || !Number.isFinite(point.y)).toBe(true);
           if (filter.isFilterZ() && point.hasZ) {
-            (Number.isFinite(point.z) || !Number.isFinite(point.z)).should.be.true;
+            expect(Number.isFinite(point.z) || !Number.isFinite(point.z)).toBe(true);
           }
           if (filter.isFilterM() && point.hasM) {
-            (Number.isFinite(point.m) || !Number.isFinite(point.m)).should.be.true;
+            expect(Number.isFinite(point.m) || !Number.isFinite(point.m)).toBe(true);
           }
           break;
       }
@@ -220,35 +220,35 @@ describe('WKB Tests', function () {
       -125, 28, -64, 66, 5, 108, -56, -59, 69, -36, -64, 83, 33, -36,
       -86, 106, -84, -16, 64, 70, 30, -104, -50, -57, 15, -7]));
 
-    GeometryCodes.getCodeForGeometryType(GeometryType.MULTICURVE).should.be.equal(bytes[4]);
+    expect(GeometryCodes.getCodeForGeometryType(GeometryType.MULTICURVE)).toEqual(bytes[4]);
 
     const geometry = global.readGeometry(bytes);
-    (geometry instanceof GeometryCollection).should.be.true;
-    geometry.geometryType.should.be.equal(GeometryType.GEOMETRYCOLLECTION)
+    expect(geometry instanceof GeometryCollection).toBe(true);
+    expect(geometry.geometryType).toEqual(GeometryType.GEOMETRYCOLLECTION)
     const multiCurve = geometry;
-    (multiCurve.numGeometries() === 2).should.be.true;
+    expect(multiCurve.numGeometries() === 2).toBe(true);
     const geometry1 = multiCurve.geometries[0];
     const geometry2 = multiCurve.geometries[1];
-    (geometry1 instanceof LineString).should.be.true;
-    (geometry2 instanceof LineString).should.be.true;
+    expect(geometry1 instanceof LineString).toBe(true);
+    expect(geometry2 instanceof LineString).toBe(true);
     const lineString1 = geometry1;
     const lineString2 = geometry2;
-    (lineString1.numPoints() === 3).should.be.true;
-    (lineString2.numPoints() === 10).should.be.true;
+    expect(lineString1.numPoints() === 3).toBe(true);
+    expect(lineString2.numPoints() === 10).toBe(true);
     const point1 = lineString1.startPoint();
     const point2 = lineString2.endPoint();
-    point1.x.should.be.equal(18.889800697319032);
-    point1.y.should.be.equal(-35.036463112927535);
-    point2.x.should.be.equal(-76.52909336488278);
-    point2.y.should.be.equal(44.2390383216843);
+    expect(point1.x).toEqual(18.889800697319032);
+    expect(point1.y).toEqual(-35.036463112927535);
+    expect(point2.x).toEqual(-76.52909336488278);
+    expect(point2.y).toEqual(44.2390383216843);
 
     const extendedMultiCurve = new ExtendedGeometryCollection(multiCurve);
-    (GeometryType.MULTICURVE).should.be.equal(extendedMultiCurve.geometryType);
+    expect(GeometryType.MULTICURVE).toEqual(extendedMultiCurve.geometryType);
 
     geometryTester(extendedMultiCurve, multiCurve);
 
     const bytes2 = global.writeBuffer(extendedMultiCurve);
-    (GeometryCodes.getCodeForGeometryType(GeometryType.MULTICURVE)).should.be.equal(bytes2[4]);
+    expect(GeometryCodes.getCodeForGeometryType(GeometryType.MULTICURVE)).toEqual(bytes2[4]);
     global.compareByteArrays(bytes, bytes2);
 
   });
@@ -266,37 +266,37 @@ describe('WKB Tests', function () {
       -23, 83, -81, -99, -78, 45, 65, 74, 85, 13, 0, -60, -101, -90,
     65, 84, -23, 84, 60, -35, 47, 27 ]));
 
-    (GeometryCodes.getCodeForGeometryType(GeometryType.MULTICURVE)).should.be.equal(bytes[4]);
+    expect(GeometryCodes.getCodeForGeometryType(GeometryType.MULTICURVE)).toEqual(bytes[4]);
 
     const geometry = global.readGeometry(bytes);
-    (geometry instanceof GeometryCollection).should.be.true;
-    (geometry.geometryType).should.be.equal(GeometryType.GEOMETRYCOLLECTION);
+    expect(geometry instanceof GeometryCollection).toBe(true)
+    expect(geometry.geometryType).toEqual(GeometryType.GEOMETRYCOLLECTION);
     const multiCurve = geometry;
-    (1).should.be.equal(multiCurve.numGeometries());
+    expect(1).toEqual(multiCurve.numGeometries());
     const geometry1 = multiCurve.geometries[0];
-    (geometry1 instanceof CompoundCurve).should.be.true;
+    expect(geometry1 instanceof CompoundCurve).toBe(true);
     const compoundCurve1 = geometry1;
-    (2).should.be.equal(compoundCurve1.numLineStrings());
+    expect(2).toEqual(compoundCurve1.numLineStrings());
     const lineString1 = compoundCurve1.lineStrings[0];
     const lineString2 = compoundCurve1.lineStrings[1];
-    (3).should.be.equal(lineString1.numPoints());
-    (2).should.be.equal(lineString2.numPoints());
+    expect(3).toEqual(lineString1.numPoints());
+    expect(2).toEqual(lineString2.numPoints());
 
-    lineString1.getPoint(0).equals(new Point(3451418.006, 5481808.951)).should.be.true;
-    lineString1.getPoint(1).equals(new Point(3451417.787, 5481809.927)).should.be.true;
-    lineString1.getPoint(2).equals(new Point(3451409.995, 5481806.744)).should.be.true;
+    expect(lineString1.getPoint(0).equals(new Point(3451418.006, 5481808.951))).toBe(true)
+    expect(lineString1.getPoint(1).equals(new Point(3451417.787, 5481809.927))).toBe(true)
+    expect(lineString1.getPoint(2).equals(new Point(3451409.995, 5481806.744))).toBe(true)
 
-    lineString2.getPoint(0).equals(new Point(3451409.995, 5481806.744)).should.be.true;
-    lineString2.getPoint(1).equals(new Point(3451418.006, 5481808.951)).should.be.true;
+    expect(lineString2.getPoint(0).equals(new Point(3451409.995, 5481806.744))).toBe(true)
+    expect(lineString2.getPoint(1).equals(new Point(3451418.006, 5481808.951))).toBe(true)
 
 
     const extendedMultiCurve = new ExtendedGeometryCollection(multiCurve);
-    (GeometryType.MULTICURVE).should.be.equal(extendedMultiCurve.geometryType);
+    expect(GeometryType.MULTICURVE).toEqual(extendedMultiCurve.geometryType);
 
     geometryTester(extendedMultiCurve, multiCurve);
 
     const bytes2 = global.writeBuffer(extendedMultiCurve);
-    (GeometryCodes.getCodeForGeometryType(GeometryType.MULTICURVE)).should.be.equal(bytes2[4]);
+    expect(GeometryCodes.getCodeForGeometryType(GeometryType.MULTICURVE)).toEqual(bytes2[4]);
     global.compareByteArrays(bytes, bytes2);
 
   })
@@ -308,7 +308,7 @@ describe('WKB Tests', function () {
     const bytes = global.writeBuffer(multiCurve);
 
     const extendedMultiCurve = new ExtendedGeometryCollection(multiCurve);
-    (GeometryType.MULTICURVE).should.be.equal(extendedMultiCurve.geometryType);
+    expect(GeometryType.MULTICURVE).toEqual(extendedMultiCurve.geometryType);
 
     const extendedBytes = global.writeBuffer(extendedMultiCurve);
 
@@ -317,24 +317,24 @@ describe('WKB Tests', function () {
     byteReader = new ByteReader(extendedBytes.slice(1, 5));
     const extendedCode = byteReader.readInt();
 
-    (GeometryCodes.getCode(multiCurve)).should.be.equal(code);
-    (GeometryCodes._getCode(GeometryType.MULTICURVE, extendedMultiCurve.hasZ, extendedMultiCurve.hasM)).should.be.equal(extendedCode);
+    expect(GeometryCodes.getCode(multiCurve)).toEqual(code);
+    expect(GeometryCodes._getCode(GeometryType.MULTICURVE, extendedMultiCurve.hasZ, extendedMultiCurve.hasM)).toEqual(extendedCode);
 
     const geometry1 = global.readGeometry(bytes);
     const geometry2 = global.readGeometry(extendedBytes);
 
-    (geometry1 instanceof GeometryCollection).should.be.true;
-    (geometry2 instanceof GeometryCollection).should.be.true;
-    (GeometryType.GEOMETRYCOLLECTION).should.be.equal(geometry1.geometryType);
-    (GeometryType.GEOMETRYCOLLECTION).should.be.equal(geometry2.geometryType);
+    expect(geometry1 instanceof GeometryCollection).toBe(true)
+    expect(geometry2 instanceof GeometryCollection).toBe(true)
+    expect(GeometryType.GEOMETRYCOLLECTION).toEqual(geometry1.geometryType);
+    expect(GeometryType.GEOMETRYCOLLECTION).toEqual(geometry2.geometryType);
 
-    geometry1.equals(multiCurve).should.be.true;
-    geometry1.equals(geometry2).should.be.true;
+    expect(geometry1.equals(multiCurve)).toBe(true);
+    expect(geometry1.equals(geometry2)).toBe(true);
 
     const geometryCollection1 = geometry1;
     const geometryCollection2 = geometry2;
-    (geometryCollection1.isMultiCurve()).should.be.true;
-    (geometryCollection2.isMultiCurve()).should.be.true;
+    expect(geometryCollection1.isMultiCurve()).toBe(true);
+    expect(geometryCollection2.isMultiCurve()).toBe(true)
 
     geometryTester(multiCurve);
     geometryTester(extendedMultiCurve, multiCurve);
@@ -349,7 +349,7 @@ describe('WKB Tests', function () {
     const bytes = global.writeBuffer(multiSurface);
 
     const extendedMultiSurface = new ExtendedGeometryCollection(multiSurface);
-    (GeometryType.MULTISURFACE).should.be.equal(extendedMultiSurface.geometryType);
+    expect(GeometryType.MULTISURFACE).toEqual(extendedMultiSurface.geometryType);
 
     const extendedBytes = global.writeBuffer(extendedMultiSurface);
 
@@ -358,24 +358,24 @@ describe('WKB Tests', function () {
     byteReader = new ByteReader(extendedBytes.slice(1, 5));
     const extendedCode = byteReader.readInt();
 
-    (GeometryCodes.getCode(multiSurface)).should.be.equal(code);
-    (GeometryCodes._getCode(GeometryType.MULTISURFACE, extendedMultiSurface.hasZ, extendedMultiSurface.hasM)).should.be.equal(extendedCode);
+    expect(GeometryCodes.getCode(multiSurface)).toEqual(code);
+    expect(GeometryCodes._getCode(GeometryType.MULTISURFACE, extendedMultiSurface.hasZ, extendedMultiSurface.hasM)).toEqual(extendedCode);
 
     const geometry1 = global.readGeometry(bytes);
     const geometry2 = global.readGeometry(extendedBytes);
 
-    (geometry1 instanceof GeometryCollection).should.be.true;
-    (geometry2 instanceof GeometryCollection).should.be.true;
-    (GeometryType.GEOMETRYCOLLECTION).should.be.equal(geometry1.geometryType);
-    (GeometryType.GEOMETRYCOLLECTION).should.be.equal(geometry2.geometryType);
+    expect(geometry1 instanceof GeometryCollection).toBe(true);
+    expect(geometry2 instanceof GeometryCollection).toBe(true)
+    expect(GeometryType.GEOMETRYCOLLECTION).toEqual(geometry1.geometryType);
+    expect(GeometryType.GEOMETRYCOLLECTION).toEqual(geometry2.geometryType);
 
-    multiSurface.equals(geometry1).should.be.true;
-    geometry1.equals(geometry2).should.be.true;
+    expect(multiSurface.equals(geometry1)).toBe(true);
+    expect(geometry1.equals(geometry2)).toBe(true)
 
     const geometryCollection1 = geometry1;
     const geometryCollection2 = geometry2;
-    (geometryCollection1.isMultiSurface()).should.be.true;
-    (geometryCollection2.isMultiSurface()).should.be.true;
+    expect(geometryCollection1.isMultiSurface()).toBe(true)
+    expect(geometryCollection2.isMultiSurface()).toBe(true)
 
     geometryTester(multiSurface);
     geometryTester(extendedMultiSurface, multiSurface);
@@ -402,32 +402,32 @@ describe('WKB Tests', function () {
     // Test a pre-created WKB hex saved as a 2.5D MultiPolygon
     const bytes = hexStringToBuffer("0106000080010000000103000080010000000F0000007835454789C456C0DFDB63124D3F2C4000000000000000004CE4512E89C456C060BF20D13F3F2C400000000000000000A42EC6388CC456C0E0A50400423F2C400000000000000000B4E3B1608CC456C060034E67433F2C400000000000000000F82138508DC456C09FD015C5473F2C400000000000000000ECD6591B8CC456C000C305BC5B3F2C4000000000000000001002AD0F8CC456C060DB367D5C3F2C40000000000000000010996DEF8AC456C0BF01756A6C3F2C4000000000000000007054A08B8AC456C0806A0C1F733F2C4000000000000000009422D81D8AC456C041CA3C5B8A3F2C4000000000000000003CCB05C489C456C03FC4FC52AA3F2C400000000000000000740315A689C456C0BFC8635EB33F2C400000000000000000E4A5630B89C456C0DFE726D6B33F2C400000000000000000F45A4F3389C456C000B07950703F2C4000000000000000007835454789C456C0DFDB63124D3F2C400000000000000000");
 
-    (1).should.be.equal(bytes[0]); // little endian
-    (GeometryCodes.getCodeForGeometryType(GeometryType.MULTIPOLYGON)).should.be.equal(bytes[1]);
-    (0).should.be.equal(bytes[2]);
-    (0).should.be.equal(bytes[3]);
-    (128).should.be.equal(bytes[4]);
+    expect(1).toEqual(bytes[0]); // little endian
+    expect(GeometryCodes.getCodeForGeometryType(GeometryType.MULTIPOLYGON)).toEqual(bytes[1]);
+    expect(0).toEqual(bytes[2]);
+    expect(0).toEqual(bytes[3]);
+    expect(128).toEqual(bytes[4]);
 
     const geometry = global.readGeometry(bytes);
-    (geometry instanceof MultiPolygon).should.be.true;
-    (geometry.geometryType).should.be.equal(GeometryType.MULTIPOLYGON);
+    expect(geometry instanceof MultiPolygon).toBe(true)
+    expect(geometry.geometryType).toEqual(GeometryType.MULTIPOLYGON);
     const multiPolygon = geometry;
-    (multiPolygon.hasZ).should.be.true;
-    multiPolygon.hasM.should.be.false;
-    multiPolygon.numGeometries().should.be.equal(1);
+    expect(multiPolygon.hasZ).toBe(true)
+    expect(multiPolygon.hasM).toBe(false)
+    expect(multiPolygon.numGeometries()).toEqual(1);
     const polygon = multiPolygon.getPolygon(0);
-    (polygon.hasZ).should.be.true;
-    (polygon.hasM).should.be.false;
-    polygon.numRings().should.be.equal(1);
+    expect(polygon.hasZ).toBe(true);
+    expect(polygon.hasM).toBe(false);
+    expect(polygon.numRings()).toEqual(1);
     const ring = polygon.getRing(0);
-    (ring.hasZ).should.be.true;
-    (ring.hasM).should.be.false;
-    ring.numPoints().should.be.equal(15);
+    expect(ring.hasZ).toBe(true)
+    expect(ring.hasM).toBe(false);
+    expect(ring.numPoints()).toEqual(15);
     for (const point of ring.points) {
-      (point.hasZ).should.be.true;
-      (point.hasM).should.be.false;
-      should.exist(point.z);
-      should.not.exist(point.m);
+      expect(point.hasZ).toBe(true)
+      expect(point.hasM).toBe(false)
+      expect(point.z).toBeDefined();
+      expect(point.m).not.toBeDefined();
     }
 
     const multiPolygonBytes = global.writeBuffer(multiPolygon, ByteOrder.LITTLE_ENDIAN);
@@ -435,7 +435,7 @@ describe('WKB Tests', function () {
 
     geometryTester(geometry, geometry2);
 
-    (bytes.length).should.be.equal(multiPolygonBytes.length);
+    expect(bytes.length).toEqual(multiPolygonBytes.length);
     let equalBytes = 0;
     for (let i = 0; i < bytes.length; i++) {
       if (bytes[i] === multiPolygonBytes[i]) {
@@ -443,7 +443,7 @@ describe('WKB Tests', function () {
       }
     }
 
-    (bytes.length - 6).should.be.equal(equalBytes);
+    expect(bytes.length - 6).toEqual(equalBytes);
   });
 
   it('test finite filter', function () {

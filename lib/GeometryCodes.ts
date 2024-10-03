@@ -1,4 +1,4 @@
-import {Geometry, GeometryType, SFException} from "@ngageoint/simple-features-js";
+import {Geometry, GeometryType, SFException} from "./sf/internal";
 
 /**
  * Geometry Code utilities to convert between geometry attributes and geometry codes

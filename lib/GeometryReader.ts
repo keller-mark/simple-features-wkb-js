@@ -17,7 +17,7 @@ import {
 	SFException,
 	TIN,
 	Triangle
-} from "@ngageoint/simple-features-js";
+} from "./sf/internal";
 import { ByteReader } from "./ByteReader";
 import { GeometryTypeInfo } from "./GeometryTypeInfo";
 import { ByteOrder } from "./ByteOrder";

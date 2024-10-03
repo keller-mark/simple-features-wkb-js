@@ -1,10 +1,10 @@
-const should = require('chai').should();
-const { Point, LineString, Polygon, MultiPoint, MultiLineString, GeometryCollection, CompoundCurve, CurvePolygon, GeometryType, MultiPolygon } = require('@ngageoint/simple-features-js');
-const { ByteOrder } = require('../lib/ByteOrder')
-const { ByteReader } = require('../lib/ByteReader')
-const { GeometryReader } = require('../lib/GeometryReader')
-const { GeometryCodes } = require('../lib/GeometryCodes')
-const { GeometryWriter } = require('../lib/GeometryWriter')
+import { describe, it, expect, should } from 'vitest';
+import { Point, LineString, Polygon, MultiPoint, MultiLineString, GeometryCollection, CompoundCurve, CurvePolygon, GeometryType, MultiPolygon } from '../lib/sf/internal';
+import { ByteOrder } from '../lib/ByteOrder';
+import { ByteReader } from '../lib/ByteReader';
+import { GeometryReader } from '../lib/GeometryReader';
+import { GeometryCodes } from '../lib/GeometryCodes';
+import { GeometryWriter } from '../lib/GeometryWriter';
 
 const module = {
 	exports: {}
@@ -12,19 +12,19 @@ const module = {
 
 global.compareEnvelopes = module.exports.compareEnvelopes = function(expected, actual) {
 	if (expected == null) {
-		should.not.exist(actual);
+		expect(actual).not.toBeDefined();
 	} else {
-		should.exist(actual);
-		expected.minX.should.be.equal(actual.minX);
-		expected.maxX.should.be.equal(actual.maxX);
-		expected.minY.should.be.equal(actual.minY);
-		expected.maxY.should.be.equal(actual.maxY);
-		(expected.minZ === actual.minZ).should.be.true;
-		(expected.maxZ === actual.maxZ).should.be.true;
-		(expected.hasZ === actual.hasZ).should.be.true;
-		(expected.minM === actual.minM).should.be.true;
-		(expected.maxM === actual.maxM).should.be.true;
-		(expected.hasM === actual.hasM).should.be.true;
+		expect(actual).toBeDefined();
+		expect(expected.minX).toEqual(actual.minX);
+		expect(expected.maxX).toEqual(actual.maxX);
+		expect(expected.minY).toEqual(actual.minY);
+		expect(expected.maxY).toEqual(actual.maxY);
+		expect(expected.minZ === actual.minZ).toBe(true);
+		expect(expected.maxZ === actual.maxZ).toBe(true);
+		expect(expected.hasZ === actual.hasZ).toBe(true);
+		expect(expected.minM === actual.minM).toBe(true);
+		expect(expected.maxM === actual.maxM).toBe(true);
+		expect(expected.hasM === actual.hasM).toBe(true);
 	}
 }
 
@@ -35,14 +35,14 @@ global.compareEnvelopes = module.exports.compareEnvelopes = function(expected, a
  */
 global.compareGeometries = module.exports.compareGeometries = function(expected, actual) {
 	if (expected == null) {
-		should.not.exist(actual);
+		expect(actual).not.toBeDefined();
 	} else {
-		should.exist(actual);
+		expect(actual).toBeDefined();
 
 		const geometryType = expected.geometryType;
 		switch (geometryType) {
 			case GeometryType.GEOMETRY:
-				should.fail(false, false, "Unexpected Geometry Type of " + GeometryType.nameFromType(geometryType) + " which is abstract");
+				expect.fail(false, false, "Unexpected Geometry Type of " + GeometryType.nameFromType(geometryType) + " which is abstract");
 				break;
 			case GeometryType.POINT:
 				comparePoint(actual, expected);
@@ -77,10 +77,10 @@ global.compareGeometries = module.exports.compareGeometries = function(expected,
 				compareCurvePolygon(expected, actual);
 				break;
 			case GeometryType.CURVE:
-				should.fail(false, false, "Unexpected Geometry Type of " + GeometryType.nameFromType(geometryType) + " which is abstract");
+				expect.fail(false, false, "Unexpected Geometry Type of " + GeometryType.nameFromType(geometryType) + " which is abstract");
 				break;
 			case GeometryType.SURFACE:
-				should.fail(false, false, "Unexpected Geometry Type of " + GeometryType.nameFromType(geometryType) + " which is abstract");
+				expect.fail(false, false, "Unexpected Geometry Type of " + GeometryType.nameFromType(geometryType) + " which is abstract");
 				break;
 			case GeometryType.POLYHEDRALSURFACE:
 				comparePolyhedralSurface(expected, actual);
@@ -104,9 +104,9 @@ global.compareGeometries = module.exports.compareGeometries = function(expected,
  * @param actual
  */
 global.compareBaseGeometryAttributes = module.exports.compareBaseGeometryAttributes = function(expected, actual) {
-	expected.geometryType.should.be.equal(actual.geometryType);
-	expected.hasZ.should.be.equal(actual.hasZ);
-	expected.hasM.should.be.equal(actual.hasM);
+	expect(expected.geometryType).toEqual(actual.geometryType);
+	expect(expected.hasZ).toEqual(actual.hasZ);
+	expect(expected.hasM).toEqual(actual.hasM);
 }
 
 /**
@@ -117,7 +117,7 @@ global.compareBaseGeometryAttributes = module.exports.compareBaseGeometryAttribu
  */
 global.comparePoint = module.exports.comparePoint = function(expected, actual) {
 	compareBaseGeometryAttributes(expected, actual);
-	expected.equals(actual).should.be.true;
+	expect(expected).toEqual(actual);
 }
 
 /**
@@ -128,7 +128,7 @@ global.comparePoint = module.exports.comparePoint = function(expected, actual) {
  */
 global.compareLineString = module.exports.compareLineString = function(expected, actual) {
 	compareBaseGeometryAttributes(expected, actual);
-	expected.numPoints().should.be.equal(actual.numPoints());
+	expect(expected.numPoints()).toEqual(actual.numPoints());
 	for (let i = 0; i < expected.numPoints(); i++) {
 		comparePoint(expected.getPoint(i), actual.getPoint(i));
 	}
@@ -142,7 +142,7 @@ global.compareLineString = module.exports.compareLineString = function(expected,
  */
 global.comparePolygon = module.exports.comparePolygon = function(expected, actual) {
 	compareBaseGeometryAttributes(expected, actual);
-	expected.numRings().should.be.equal(actual.numRings());
+	expect(expected.numRings()).toEqual(actual.numRings());
 	for (let i = 0; i < expected.numRings(); i++) {
 		compareLineString(expected.getRing(i), actual.getRing(i));
 	}
@@ -156,7 +156,7 @@ global.comparePolygon = module.exports.comparePolygon = function(expected, actua
  */
 global.compareMultiPoint = module.exports.compareMultiPoint = function(expected, actual) {
 	compareBaseGeometryAttributes(expected, actual);
-	expected.numPoints().should.be.equal(actual.numPoints());
+	expect(expected.numPoints()).toEqual(actual.numPoints());
 	for (let i = 0; i < expected.numPoints(); i++) {
 		comparePoint(expected.points[i], actual.points[i]);
 	}
@@ -170,7 +170,7 @@ global.compareMultiPoint = module.exports.compareMultiPoint = function(expected,
  */
 global.compareMultiLineString = module.exports.compareMultiLineString = function(expected, actual) {
 	compareBaseGeometryAttributes(expected, actual);
-	expected.numLineStrings().should.be.equal(actual.numLineStrings());
+	expect(expected.numLineStrings()).toEqual(actual.numLineStrings());
 	for (let i = 0; i < expected.numLineStrings(); i++) {
 		compareLineString(expected.lineStrings[i], actual.lineStrings[i]);
 	}
@@ -184,7 +184,7 @@ global.compareMultiLineString = module.exports.compareMultiLineString = function
  */
 global.compareMultiPolygon = module.exports.compareMultiPolygon = function(expected, actual) {
 	compareBaseGeometryAttributes(expected, actual);
-	expected.numPolygons().should.be.equal(actual.numPolygons());
+	expect(expected.numPolygons()).toEqual(actual.numPolygons());
 	for (let i = 0; i < expected.numPolygons(); i++) {
 		comparePolygon(expected.polygons[i], actual.polygons[i]);
 	}
@@ -198,7 +198,7 @@ global.compareMultiPolygon = module.exports.compareMultiPolygon = function(expec
  */
 global.compareGeometryCollection = module.exports.compareGeometryCollection = function(expected, actual) {
 	compareBaseGeometryAttributes(expected, actual);
-	expected.numGeometries().should.be.equal(actual.numGeometries());
+	expect(expected.numGeometries()).toEqual(actual.numGeometries());
 	for (let i = 0; i < expected.numGeometries(); i++) {
 		compareGeometries(expected.getGeometry(i), actual.getGeometry(i));
 	}
@@ -212,7 +212,7 @@ global.compareGeometryCollection = module.exports.compareGeometryCollection = fu
  */
 global.compareCircularString = module.exports.compareCircularString = function(expected, actual) {
 	compareBaseGeometryAttributes(expected, actual);
-	expected.numPoints().should.be.equal(actual.numPoints());
+	expect(expected.numPoints()).toEqual(actual.numPoints());
 	for (let i = 0; i < expected.numPoints(); i++) {
 		comparePoint(expected.points[i], actual.points[i]);
 	}
@@ -226,7 +226,7 @@ global.compareCircularString = module.exports.compareCircularString = function(e
  */
 global.compareCompoundCurve = module.exports.compareCompoundCurve = function(expected, actual) {
 	compareBaseGeometryAttributes(expected, actual);
-	expected.numLineStrings().should.be.equal(actual.numLineStrings());
+	expect(expected.numLineStrings()).toEqual(actual.numLineStrings());
 	for (let i = 0; i < expected.numLineStrings(); i++) {
 		compareLineString(expected.lineStrings[i], actual.lineStrings[i]);
 	}
@@ -240,7 +240,7 @@ global.compareCompoundCurve = module.exports.compareCompoundCurve = function(exp
  */
 global.compareCurvePolygon = module.exports.compareCurvePolygon = function(expected, actual) {
 	compareBaseGeometryAttributes(expected, actual);
-	expected.numRings().should.be.equal(actual.numRings());
+	expect(expected.numRings()).toEqual(actual.numRings());
 	for (global. i = 0; i < expected.numRings(); i++) {
 		compareGeometries(expected.rings[i], actual.rings[i]);
 	}
@@ -254,7 +254,7 @@ global.compareCurvePolygon = module.exports.compareCurvePolygon = function(expec
  */
 global.comparePolyhedralSurface = module.exports.comparePolyhedralSurface = function(expected, actual) {
 	compareBaseGeometryAttributes(expected, actual);
-	expected.numPolygons().should.be.equal(actual.numPolygons());
+	expect(expected.numPolygons()).toEqual(actual.numPolygons());
 	for (let i = 0; i < expected.numPolygons(); i++) {
 		compareGeometries(expected.polygons[i], actual.polygons[i]);
 	}
@@ -268,7 +268,7 @@ global.comparePolyhedralSurface = module.exports.comparePolyhedralSurface = func
  */
 global.compareTIN = module.exports.compareTIN = function(expected, actual) {
 	compareBaseGeometryAttributes(expected, actual);
-	expected.numPolygons().should.be.equal(actual.numPolygons());
+	expect(expected.numPolygons()).toEqual(actual.numPolygons());
 	for (let i = 0; i < expected.numPolygons(); i++) {
 		compareGeometries(expected.polygons[i], actual.polygons[i]);
 	}
@@ -282,7 +282,7 @@ global.compareTIN = module.exports.compareTIN = function(expected, actual) {
  */
 global.compareTriangle = module.exports.compareTriangle = function(expected, actual) {
 	compareBaseGeometryAttributes(expected, actual);
-	expected.numRings().should.be.equal(actual.numRings());
+	expect(expected.numRings()).toEqual(actual.numRings());
 	for (let i = 0; i < expected.numRings(); i++) {
 		compareLineString(expected.rings[i], actual.rings[i]);
 	}
@@ -590,7 +590,7 @@ global.readGeometry = module.exports.readGeoemtry = function(bytes, byteOrder) {
 	const geometry = GeometryReader.readGeometry(reader);
 	const reader2 = new ByteReader(bytes, byteOrder);
 	const geometryTypeInfo = GeometryReader.readGeometryType(reader2);
-	geometryTypeInfo.geometryType.should.be.equal(GeometryCodes.getGeometryType(geometryTypeInfo.geometryTypeCode))
+	expect(geometryTypeInfo.geometryType).toEqual(GeometryCodes.getGeometryType(geometryTypeInfo.geometryTypeCode))
 	let expectedGeometryType = geometryTypeInfo.geometryType;
 	switch (expectedGeometryType) {
 		case GeometryType.MULTICURVE:
@@ -599,9 +599,9 @@ global.readGeometry = module.exports.readGeoemtry = function(bytes, byteOrder) {
 			break;
 		default:
 	}
-	expectedGeometryType.should.be.equal(geometry.geometryType);
-	geometryTypeInfo.hasZ.should.be.equal(geometry.hasZ);
-	geometryTypeInfo.hasM.should.be.equal(geometry.hasM);
+	expect(expectedGeometryType).toEqual(geometry.geometryType);
+	expect(geometryTypeInfo.hasZ).toEqual(geometry.hasZ);
+	expect(geometryTypeInfo.hasM).toEqual(geometry.hasM);
 	return geometry;
 }
 
@@ -611,5 +611,5 @@ global.readGeometry = module.exports.readGeoemtry = function(bytes, byteOrder) {
  * @param actual actual bytes
  */
 global.compareByteArrays = module.exports.compareByteArrays = function(expected, actual) {
-	Buffer.compare(expected, actual).should.be.equal(0);
+	expect(Buffer.compare(expected, actual)).toBe(0);
 }

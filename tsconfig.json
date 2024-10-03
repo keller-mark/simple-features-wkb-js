@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
-      "module": "commonjs",
+      "module": "ESNext",
       "moduleResolution": "node",
-      "lib": ["dom", "es2015", "es2017", "es2015.iterable"],
+      "lib": ["ES2020", "DOM", "DOM.Iterable"],
       "jsx": "react", // uses typescript to transpile jsx to js
-      "target": "es5", // specify ECMAScript target version
+      "target": "ES2020", // specify ECMAScript target version
       "allowJs": true, // allows a partial TypeScript and JavaScript codebase
       "declaration": true,
       "checkJs": false, // checks types in .js files (https://github.com/microsoft/TypeScript/wiki/Type-Checking-JavaScript-Files)
